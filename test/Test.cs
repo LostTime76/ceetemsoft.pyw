@@ -1,15 +1,15 @@
-using System.Net;
-
 using CeetemSoft.Pyw;
 
 public static class Test
 {
     public static void Main(string[] args)
     {
-        PyInterp interp = new PyInterp();
-        interp.DebugHost = "localhost";
-        interp.DebugPort = 4242;
+        PyInterp interp = PyInterp.Instance;
 
-        interp.Start("tst");
+        interp.Start("localhost", 4242);
+
+        PySys sys = interp.Sys;
+        sys.CacheDir = new PyString("blah blah");
+        string s = ((PyString)sys.CacheDir).Value;
     }
 }

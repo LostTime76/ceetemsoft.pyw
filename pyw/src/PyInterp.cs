@@ -1,94 +1,61 @@
 namespace CeetemSoft.Pyw;
 
-public partial class PyInterp
+public sealed partial class PyInterp
 {
-    private const string ScriptsDir  = "scripts";
-    private const string DebugModule = "dbg";
+    public bool   Started { get; private set; }
+    public string Name    { get; private set; }
+    public string Dir     { get; private set; }
+    public string DllPath { get; private set; }
+    public string ExePath { get; private set; }
+    public PySys  Sys     { get; private set; }
 
-    public int    DebugPort { get; set; }
-    public string DebugHost { get; set; }
+    public static readonly PyInterp Instance = new PyInterp();
 
-    public readonly string      Name;
-    public readonly string      Dir;
-    public readonly string      DllPath;
-    public readonly string      ExePath;
-    public readonly string      Version;
-    public readonly PySysObject Sys;
+    private string _version;
 
-    public PyInterp(string version = null)
+    private PyInterp() { }
+
+    public void Start(string dbgHost = null, int dbgPort = 0)
     {
-        Dir     = GetPythonDir(version);
-        Name    = Path.GetFileName(Dir);
-        Version = Name.Substring(PyConst.Python.Length);
-        DllPath = Path.Combine(Dir, string.Format(PyUtil.DllPathFmt, Name));
-        ExePath = Path.Combine(Dir, string.Format(PyUtil.ExePathFmt, PyConst.Python));
-        Sys     = new PySysObject();
-        PyNative.Init(DllPath);
+        if (_version == null)
+        {
+            Init();
+        }
+
+        // Initialize and start the interpreter
+        PyNative.PyStart();
+
+        // Set the started flag
+        Sys     = new PySys();
+        Started = true;
     }
 
     public void Stop()
     {
-        // Clean up the interpreter
-        PyNative.Py_Finalize();
+        // Stop and clean up the interpreter
+        PyNative.PyStop();
+
+        // Clear the started flag
+        Started = false;
     }
 
-    public PyModule Start(string module, params string[] args)
+    private void Init(string version = null)
     {
-        return Start(module, args.AsSpan());
-    }
-
-    public PyModule Start(string module, ReadOnlySpan<string> args)
-    {
-        // Initialize the interpreter
-        PyNative.Py_Initialize();
-
-        // Initialize the system paths so the modules can be found
-        InitSysPaths(module);
-
-        // Attach the debugger
-        AttachDebugger();
-
-        // Start the main module
-        return StartMainModule(module, args);
-    }
-
-    private void AttachDebugger()
-    {
-        if (DebugHost == null)
+        if (Started)
         {
-            // There is no request to attach a debugger
+            ThrowHelper.VersionSetWhenStarted();
+        }
+        else if ((_version != null) && (version == _version))
+        {
             return;
         }
 
-        // Set the arguments for the debugger
-        Sys.Args = new PyList(new PyObject[]
-        {
-            new PyObject(ExePath),
-            new PyObject(DebugHost),
-            new PyObject((long)DebugPort)
-        });
-
-        // Start the debug module
-        PyModule.Import(DebugModule);
-    }
-
-    private void InitSysPaths(string module)
-    {
-        // Get the system paths list
-        PyList paths = Sys.Path.AsList();
-
-        // Add the starting module and internal scripts path
-        paths.Append(Path.GetDirectoryName(Path.GetFullPath(module)));
-        paths.Append(Path.Combine(PyUtil.AssemblyDir, ScriptsDir));
-    }
-
-    private PyModule StartMainModule(string module, ReadOnlySpan<string> args)
-    {
-        // Set the module arguments
-        Sys.Args = new PyList(args);
-
-        // Start the module
-        return PyModule.Import(Path.GetFileName(module));
+        Dir      = GetPythonDir(version);
+        Name     = Path.GetFileName(Dir);
+        DllPath  = Path.Combine(Dir, string.Format(PyUtil.DllPathFmt, Name));
+        ExePath  = Path.Combine(Dir, string.Format(PyUtil.ExePathFmt, PyConst.Python));
+        _version = Name.Substring(PyConst.Python.Length);
+        PyNative.Init(DllPath);
     }
 
     private static string GetPythonDir(string version)
@@ -116,7 +83,7 @@ public partial class PyInterp
             }
         }
 
-        return ThrowHelper.PythonVerNotFound(root, version);
+        return ThrowHelper.VerNotFound(root, version);
     }
 
     private static string FindPythonDirFromPath()
@@ -139,6 +106,12 @@ public partial class PyInterp
             }
         }
 
-        return ThrowHelper.PythonDirNotFound();
+        return ThrowHelper.DirNotFound();
+    }
+
+    public string Version
+    {
+        get { return _version; }
+        set { Init(value); }
     }
 }
