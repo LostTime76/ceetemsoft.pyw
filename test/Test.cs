@@ -7,9 +7,5 @@ public static class Test
         PyInterp interp = PyInterp.Instance;
 
         interp.Start("localhost", 4242);
-
-        PySys sys = interp.Sys;
-        sys.CacheDir = new PyString("blah blah");
-        string s = ((PyString)sys.CacheDir).Value;
     }
 }

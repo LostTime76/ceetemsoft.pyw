@@ -1,12 +1,27 @@
 namespace CeetemSoft.Pyw;
 
-public readonly partial struct PySys
+public sealed partial class PySys
 {
-    private const string CachePrefix = "pycache_prefix";
+    public const string CacheDirAttrKey = "pycache_prefix";
+    public const string ModulesAttrKey  = "modules";
 
-    public PyObject CacheDir
+    internal PySys() { }
+
+    public PyStr CacheDir
     {
-        get { return PyNative.GetSysObject(CachePrefix); }
-        set { PyNative.SetSysObject(CachePrefix, value); }
+        get { return new PyStr(PyNative.PySys_GetAttr(CacheDirAttrKey)); }
+        set { PyNative.PySys_SetAttr(CacheDirAttrKey, value); }
+    }
+
+    public PyDict Modules
+    {
+        get { return new PyDict(PyNative.PySys_GetAttr(ModulesAttrKey)); }
+        set { PyNative.PySys_SetAttr(ModulesAttrKey, value); }
+    }
+
+    public PyObj this[string key]
+    {
+        get { return PyNative.PySys_GetAttr(key); }
+        set { PyNative.PySys_SetAttr(key, value); }
     }
 }

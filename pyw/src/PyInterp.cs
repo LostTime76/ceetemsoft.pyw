@@ -23,7 +23,7 @@ public sealed partial class PyInterp
         }
 
         // Initialize and start the interpreter
-        PyNative.PyStart();
+        PyNative.Py_Init();
 
         // Set the started flag
         Sys     = new PySys();
@@ -33,7 +33,7 @@ public sealed partial class PyInterp
     public void Stop()
     {
         // Stop and clean up the interpreter
-        PyNative.PyStop();
+        PyNative.Py_DeInit();
 
         // Clear the started flag
         Started = false;
@@ -55,7 +55,7 @@ public sealed partial class PyInterp
         DllPath  = Path.Combine(Dir, string.Format(PyUtil.DllPathFmt, Name));
         ExePath  = Path.Combine(Dir, string.Format(PyUtil.ExePathFmt, PyConst.Python));
         _version = Name.Substring(PyConst.Python.Length);
-        PyNative.Init(DllPath);
+        PyNative.SetDll(DllPath);
     }
 
     private static string GetPythonDir(string version)
