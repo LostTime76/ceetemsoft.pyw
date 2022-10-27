@@ -9,7 +9,7 @@
                 "build",
                 "${workspaceFolder}/test/test.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
             ],
             "problemMatcher": "$msCompile"
         },
