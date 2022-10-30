@@ -1,42 +1,122 @@
 namespace CeetemSoft.Pyw;
 
-public sealed partial class PyInterp
+using System.Runtime.InteropServices;
+
+unsafe public sealed partial class PyInterp
 {
     public bool   Started { get; private set; }
     public string Name    { get; private set; }
     public string Dir     { get; private set; }
     public string DllPath { get; private set; }
     public string ExePath { get; private set; }
-    public PySys  Sys     { get; private set; }
 
     public static readonly PyInterp Instance = new PyInterp();
+
+    public static PySys Sys;
 
     private string _version;
 
     private PyInterp() { }
 
-    public void Start(string dbgHost = null, int dbgPort = 0)
+    public void Start()
     {
-        if (_version == null)
+        if (Started)
+        {
+            ThrowHelper.Started();
+        }
+        else if (_version == null)
         {
             Init();
         }
 
         // Initialize and start the interpreter
-        PyNative.Py_Init();
+        PyNative.Py_Initialize();
 
-        // Set the started flag
-        Sys     = new PySys();
+        // Get a reference to the system object
+        Sys     = GetSysObj();
         Started = true;
     }
 
     public void Stop()
     {
+        if (!Started)
+        {
+            ThrowHelper.Stopped();
+        }
+
         // Stop and clean up the interpreter
-        PyNative.Py_DeInit();
+        PyNative.Py_Finalize();
 
         // Clear the started flag
         Started = false;
+    }
+
+    public PyObj Eval(string expr)
+    {
+        int   len   = PyUtil.GetUtf8StrLen(expr);
+        byte* pExpr = stackalloc byte[len + 1];
+        PyUtil.StrToUtf8Str(expr, pExpr, len);
+
+        // Get the system module dictionary
+        PyObj* pGlobs = PyNative.PyModule_GetDict(Sys.pObj);
+
+        // Evaluate the expression and return the result
+        return new PyObj(PyNative.PyRun_Str(pExpr, PyConst.Py_Eval_Input, pGlobs, null));
+    }
+
+    public PyModule Import(string filepath)
+    {
+        return Import(filepath, ReadOnlySpan<string>.Empty);
+    }
+
+    public PyModule Import(string filepath, params string[] args)
+    {
+        return Import(filepath, args.AsSpan());
+    }
+
+    public PyModule Import(string filepath, params PyObj[] args)
+    {
+        return Import(filepath, args.AsSpan());
+    }
+
+    public PyModule Import(string filepath, ReadOnlySpan<string> args)
+    {
+        Span<PyObj> objArgs = stackalloc PyObj[args.Length];
+
+        for (int idx = 0; idx < args.Length; idx++)
+        {
+            objArgs[idx] = Eval(args[idx]);
+        }
+
+        return Import(filepath, objArgs);
+    }
+
+    public PyModule Import(string filepath, ReadOnlySpan<PyObj> args)
+    {
+        // Get the full path to the script
+        filepath = Path.GetFullPath(filepath);
+
+        // Create a new argument list
+        PyStr  modName = new PyStr(Path.GetFileNameWithoutExtension(filepath));
+        PyList argv    = new PyList(args.Length + 1);
+
+        // Set the first argument to the script filepath
+        argv[0] = new PyStr(filepath);
+
+        // Add the other arguments to the list
+        for (int idx = 0; idx < args.Length; idx++)
+        {
+            argv[idx + 1] = args[idx];
+        }
+
+        // Set the arguments for the script
+        Sys.Argv = argv;
+
+        // Add the script directory to the system path if it is not already
+        Sys.AppendToPath(Path.GetDirectoryName(filepath));
+
+        // Import the module
+        return new PyModule(PyNative.PyImport_Import(modName.pObj));
     }
 
     private void Init(string version = null)
@@ -107,6 +187,19 @@ public sealed partial class PyInterp
         }
 
         return ThrowHelper.DirNotFound();
+    }
+
+    private static PySys GetSysObj()
+    {
+        int   len   = PyUtil.GetUtf8StrLen(PySys.ModulesAttr);
+        byte* pAttr = stackalloc byte[len + 1];
+        PyUtil.StrToUtf8Str(PySys.ModulesAttr, pAttr, len);
+
+        // Get the modules dictionary
+        PyDict modules = new PyDict(PyNative.PySys_GetObj(pAttr));
+
+        // Return the system module
+        return new PySys(modules[PySys.Name].pObj);
     }
 
     public string Version
