@@ -11,23 +11,17 @@ unsafe public readonly partial struct PyObj
 
     public override string ToString()
     {
-        return ToString(this);
-    }
+        string str = PyNative.PyObj_NetStr(pObj);
 
-    public static string ToString(PyObj obj)
-    {
-        PyObj* pStrObj = PyNative.PyObj_Str(obj.pObj);
-        byte*  pStr    = PyNative.PyUnicode_AsUtf8(pStrObj);
-
-        if ((pStrObj == null) || (pStr == null))
+        if (str == null)
         {
-            ThrowHelper.CouldNotGetStr(obj);
+            ThrowHelper.ToStringFailure(this);
         }
 
-        return new string((sbyte*)pStr);
+        return str;
     }
 
-    public static bool IsType(PyObj obj, int flags)
+    internal static bool IsType(PyObj obj, int flags)
     {
         return ((PyNative.PyType_GetFlags(((PyObjBase*)obj.pObj)->pType) & flags) != 0);
     }

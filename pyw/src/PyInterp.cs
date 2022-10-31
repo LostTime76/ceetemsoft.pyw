@@ -12,8 +12,6 @@ unsafe public sealed partial class PyInterp
 
     public static readonly PyInterp Instance = new PyInterp();
 
-    public static PySys Sys;
-
     private string _version;
 
     private PyInterp() { }
@@ -33,7 +31,6 @@ unsafe public sealed partial class PyInterp
         PyNative.Py_Initialize();
 
         // Get a reference to the system object
-        Sys     = GetSysObj();
         Started = true;
     }
 
@@ -51,74 +48,6 @@ unsafe public sealed partial class PyInterp
         Started = false;
     }
 
-    public PyObj Eval(string expr)
-    {
-        int   len   = PyUtil.GetUtf8StrLen(expr);
-        byte* pExpr = stackalloc byte[len + 1];
-        PyUtil.StrToUtf8Str(expr, pExpr, len);
-
-        // Get the system module dictionary
-        PyObj* pGlobs = PyNative.PyModule_GetDict(Sys.pObj);
-
-        // Evaluate the expression and return the result
-        return new PyObj(PyNative.PyRun_Str(pExpr, PyConst.Py_Eval_Input, pGlobs, null));
-    }
-
-    public PyModule Import(string filepath)
-    {
-        return Import(filepath, ReadOnlySpan<string>.Empty);
-    }
-
-    public PyModule Import(string filepath, params string[] args)
-    {
-        return Import(filepath, args.AsSpan());
-    }
-
-    public PyModule Import(string filepath, params PyObj[] args)
-    {
-        return Import(filepath, args.AsSpan());
-    }
-
-    public PyModule Import(string filepath, ReadOnlySpan<string> args)
-    {
-        Span<PyObj> objArgs = stackalloc PyObj[args.Length];
-
-        for (int idx = 0; idx < args.Length; idx++)
-        {
-            objArgs[idx] = Eval(args[idx]);
-        }
-
-        return Import(filepath, objArgs);
-    }
-
-    public PyModule Import(string filepath, ReadOnlySpan<PyObj> args)
-    {
-        // Get the full path to the script
-        filepath = Path.GetFullPath(filepath);
-
-        // Create a new argument list
-        PyStr  modName = new PyStr(Path.GetFileNameWithoutExtension(filepath));
-        PyList argv    = new PyList(args.Length + 1);
-
-        // Set the first argument to the script filepath
-        argv[0] = new PyStr(filepath);
-
-        // Add the other arguments to the list
-        for (int idx = 0; idx < args.Length; idx++)
-        {
-            argv[idx + 1] = args[idx];
-        }
-
-        // Set the arguments for the script
-        Sys.Argv = argv;
-
-        // Add the script directory to the system path if it is not already
-        Sys.AppendToPath(Path.GetDirectoryName(filepath));
-
-        // Import the module
-        return new PyModule(PyNative.PyImport_Import(modName.pObj));
-    }
-
     private void Init(string version = null)
     {
         if (Started)
@@ -132,8 +61,8 @@ unsafe public sealed partial class PyInterp
 
         Dir      = GetPythonDir(version);
         Name     = Path.GetFileName(Dir);
-        DllPath  = Path.Combine(Dir, string.Format(PyUtil.DllPathFmt, Name));
-        ExePath  = Path.Combine(Dir, string.Format(PyUtil.ExePathFmt, PyConst.Python));
+        DllPath  = Path.Combine(Dir, string.Format(PyConst.DllPathFmt, Name));
+        ExePath  = Path.Combine(Dir, string.Format(PyConst.ExePathFmt, PyConst.Python));
         _version = Name.Substring(PyConst.Python.Length);
         PyNative.SetDll(DllPath);
     }
@@ -169,8 +98,8 @@ unsafe public sealed partial class PyInterp
     private static string FindPythonDirFromPath()
     {
         // Get the path environment variable
-        string   var   = Environment.GetEnvironmentVariable(PyUtil.PathEnvVar);
-        string[] paths = var.Split(PyUtil.PathDelim, StringSplitOptions.RemoveEmptyEntries);
+        string   var   = Environment.GetEnvironmentVariable(PyConst.PathEnvVar);
+        string[] paths = var.Split(PyConst.PathDelim, StringSplitOptions.RemoveEmptyEntries);
 
         // Iterate through the paths
         foreach (string path in paths)
@@ -187,19 +116,6 @@ unsafe public sealed partial class PyInterp
         }
 
         return ThrowHelper.DirNotFound();
-    }
-
-    private static PySys GetSysObj()
-    {
-        int   len   = PyUtil.GetUtf8StrLen(PySys.ModulesAttr);
-        byte* pAttr = stackalloc byte[len + 1];
-        PyUtil.StrToUtf8Str(PySys.ModulesAttr, pAttr, len);
-
-        // Get the modules dictionary
-        PyDict modules = new PyDict(PyNative.PySys_GetObj(pAttr));
-
-        // Return the system module
-        return new PySys(modules[PySys.Name].pObj);
     }
 
     public string Version

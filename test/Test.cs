@@ -7,7 +7,5 @@ public static class Test
         PyInterp interp = PyInterp.Instance;
 
         interp.Start();
-
-        interp.Import("tst.py", "{'a':12, 'b':42}");
     }
 }

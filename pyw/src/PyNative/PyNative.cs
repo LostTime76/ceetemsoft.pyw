@@ -3,83 +3,20 @@ namespace CeetemSoft.Pyw;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-#pragma warning disable 649
 unsafe internal static partial class PyNative
 {
-    [PySymbol]
-    internal static delegate* unmanaged<void> Py_Initialize;
+    private const int SymbolStart   = 1;
+    private const int Utf8_CodePage = 65001;
 
-    [PySymbol]
-    internal static delegate* unmanaged<void> Py_Finalize;
+    [DllImport("kernel32.dll")]
+    private static extern int WideCharToMultiByte(
+        int codePage, int flags, [MarshalAs(UnmanagedType.LPWStr)] string str, int strLen, byte* pDst,
+        int dstLen, byte* pDefChar, out bool usedDefChar);
 
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, PyObj*> PyImport_Import;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, PyObj*> PyModule_GetDict;
-
-    [PySymbol("PySys_GetObject")]
-    internal static delegate* unmanaged<byte*, PyObj*> PySys_GetObj;
-
-    [PySymbol("PySys_SetObject")]
-    internal static delegate* unmanaged<byte*, PyObj*, int> PySys_SetObj;
-
-    [PySymbol("PyUnicode_FromString")]
-    internal static delegate* unmanaged<byte*, PyObj*> PyUnicode_FromStr;
-
-    [PySymbol("PyUnicode_AsUTF8")]
-    internal static delegate* unmanaged<PyObj*, byte*> PyUnicode_AsUtf8;
-
-    [PySymbol("PyRun_String")]
-    internal static delegate* unmanaged<byte*, int, PyObj*, PyObj*, PyObj*> PyRun_Str;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyTypeObj*, int> PyType_GetFlags;
-
-    [PySymbol("PyObject_GetAttrString")]
-    internal static delegate* unmanaged<PyObj*, byte*, PyObj*> PyObj_GetAttrStr;
-
-    [PySymbol("PyObject_SetAttrString")]
-    internal static delegate* unmanaged<PyObj*, byte*, PyObj*, int> PyObj_SetAttrStr;
-
-    [PySymbol("PyObject_Str")]
-    internal static delegate* unmanaged<PyObj*, PyObj*> PyObj_Str;
-
-    [PySymbol]
-    internal static delegate* unmanaged<int, PyObj*> PyList_New;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, int> PyList_Size;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, int, PyObj*> PyList_GetItem;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, int, int, PyObj*> PyList_GetSlice;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, PyObj*, int> PyList_Append;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, int, PyObj*, int> PyList_SetItem;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, int, int, PyObj*, int> PyList_SetSlice;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, int, PyObj*, int> PyList_Insert;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*> PyDict_New;
-
-    [PySymbol("PyDict_GetItemString")]
-    internal static delegate* unmanaged<PyObj*, byte*, PyObj*> PyDict_GetItemStr;
-
-    [PySymbol]
-    internal static delegate* unmanaged<PyObj*, PyObj*, PyObj*, int> PyDict_SetItem;
-
-    [PySymbol("PyDict_SetItemString")]
-    internal static delegate* unmanaged<PyObj*, byte*, PyObj*, int> PyDict_SetItemStr;
+    [DllImport("kernel32.dll")]
+    private static extern int MultiByteToWideChar(
+        int codePage, int flags, byte* pSrc, int srcLen,
+        [MarshalAs(UnmanagedType.LPWStr)] string str, int strLen);
 
     private static nint hDll;
 
@@ -109,17 +46,27 @@ unsafe internal static partial class PyNative
             if (attr != null)
             {
                 // Load the symbol
-                LoadSymbol(field, attr);
+                LoadSymbol(field);
             }
         }
     }
 
-    private static void LoadSymbol(FieldInfo field, PySymbolAttribute attr)
+    private static void LoadSymbol(FieldInfo field)
     {
         // Get the symbol name
-        string symbol = ((attr.Symbol != null) ? attr.Symbol : field.Name);
+        string symbol = field.Name.Substring(SymbolStart);
 
-        // Load the symbol from the dll
+        // Load the symbol
         field.SetValue(null, NativeLibrary.GetExport(hDll, symbol));
+    }
+
+    private static void StrToUtf8Str(string str, byte* pDst, int dstLen)
+    {
+        WideCharToMultiByte(Utf8_CodePage, 0, str, str.Length, pDst, dstLen, null, out _);
+    }
+
+    private static int GetUtf8StrLen(string str)
+    {
+        return WideCharToMultiByte(Utf8_CodePage, 0, str, str.Length, null, 0, null, out _);
     }
 }

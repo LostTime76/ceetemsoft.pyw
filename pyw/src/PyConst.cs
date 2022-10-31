@@ -2,8 +2,12 @@ namespace CeetemSoft.Pyw;
 
 public static class PyConst
 {
-    public const int    Error  = -1;
-    public const string Python = "python";
+    public const int    Error      = -1;
+    public const string Python     = "python";
+    public const char   PathDelim  = ';';
+    public const string ExePathFmt = "{0}.exe";
+    public const string DllPathFmt = "{0}.dll";
+    public const string PathEnvVar = "Path";
 
     internal const int Py_Long_Subclass    = (1 << 24);
     internal const int Py_List_Subclass    = (1 << 25);
