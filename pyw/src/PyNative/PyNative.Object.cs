@@ -4,42 +4,42 @@ namespace CeetemSoft.Pyw;
 unsafe internal static partial class PyNative
 {
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, void> _Py_IncRef;
+    private static delegate* unmanaged<nint, void> _Py_IncRef;
 
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, void> _Py_DecRef;
+    private static delegate* unmanaged<nint, void> _Py_DecRef;
 
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, PyObj*, PyObj*> _PyObject_GetAttr;
+    private static delegate* unmanaged<nint, nint, nint> _PyObject_GetAttr;
 
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, byte*, PyObj*> _PyObject_GetAttrString;
+    private static delegate* unmanaged<nint, byte*, nint> _PyObject_GetAttrString;
 
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, PyObj*, PyObj*, int> _PyObject_SetAttr;
+    private static delegate* unmanaged<nint, nint, nint, int> _PyObject_SetAttr;
 
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, byte*, PyObj*, int> _PyObject_SetAttrString;
+    private static delegate* unmanaged<nint, byte*, nint, int> _PyObject_SetAttrString;
 
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, PyObj*> _PyObject_Str;
+    private static delegate* unmanaged<nint, nint> _PyObject_Str;
 
-    internal static void PyObj_IncRef(PyObj* pObj)
+    internal static void PyObj_IncRef(nint pObj)
     {
         _Py_IncRef(pObj);
     }
 
-    internal static void PyObj_DecRef(PyObj* pObj)
+    internal static void PyObj_DecRef(nint pObj)
     {
         _Py_DecRef(pObj);
     }
 
-    internal static PyObj* PyObj_GetAttr(PyObj* pObj, PyObj* pAttr)
+    internal static nint PyObj_GetAttr(nint pObj, nint pAttr)
     {
         return _PyObject_GetAttr(pObj, pAttr);
     }
 
-    internal static PyObj* PyObj_GetAttr(PyObj* pObj, string attr)
+    internal static nint PyObj_GetAttr(nint pObj, string attr)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
@@ -48,12 +48,12 @@ unsafe internal static partial class PyNative
         return _PyObject_GetAttrString(pObj, pAttr);
     }
 
-    internal static bool PyObj_SetAttr(PyObj* pObj, PyObj* pAttr, PyObj* pValue)
+    internal static bool PyObj_SetAttr(nint pObj, nint pAttr, nint pValue)
     {
         return (_PyObject_SetAttr(pObj, pAttr, pValue) == 0);
     }
 
-    internal static bool PyObj_SetAttr(PyObj* pObj, string attr, PyObj* pValue)
+    internal static bool PyObj_SetAttr(nint pObj, string attr, nint pValue)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
@@ -62,31 +62,31 @@ unsafe internal static partial class PyNative
         return (_PyObject_SetAttrString(pObj, pAttr, pValue) == 0);
     }
 
-    internal static bool PyObj_DelAttr(PyObj* pObj, PyObj* pAttr)
+    internal static bool PyObj_DelAttr(nint pObj, nint pAttr)
     {
-        return (_PyObject_SetAttr(pObj, pAttr, null) == 0);
+        return (_PyObject_SetAttr(pObj, pAttr, 0) == 0);
     }
 
-    internal static bool PyObj_DelAttr(PyObj* pObj, string attr)
+    internal static bool PyObj_DelAttr(nint pObj, string attr)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
         StrToUtf8Str(attr, pAttr, len);
 
-        return (_PyObject_SetAttrString(pObj, pAttr, null) == 0);
+        return (_PyObject_SetAttrString(pObj, pAttr, 0) == 0);
     }
 
-    internal static PyObj* PyObj_Str(PyObj* pObj)
+    internal static nint PyObj_Str(nint pObj)
     {
         return _PyObject_Str(pObj);
     }
 
-    internal static string PyObj_NetStr(PyObj* pObj)
+    internal static string PyObj_NetStr(nint pObj)
     {
         // Get the object's string representation
-        PyObj* pStr = _PyObject_Str(pObj);
+        nint pStr = _PyObject_Str(pObj);
 
-        if (pStr == null)
+        if (pStr == 0)
         {
             return null;
         }

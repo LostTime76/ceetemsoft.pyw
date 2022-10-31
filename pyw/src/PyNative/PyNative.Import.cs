@@ -4,9 +4,9 @@ namespace CeetemSoft.Pyw;
 unsafe internal static partial class PyNative
 {
     [PySymbol]
-    private static delegate* unmanaged<PyObj*, PyObj*> _PyImport_Import;
+    private static delegate* unmanaged<nint, nint> _PyImport_Import;
 
-    internal static PyObj* PyImport_Import(string module)
+    internal static nint PyImport_Import(string module)
     {
         return _PyImport_Import(PyUnicode_New(module));
     }

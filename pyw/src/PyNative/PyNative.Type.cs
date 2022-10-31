@@ -4,9 +4,9 @@ namespace CeetemSoft.Pyw;
 unsafe internal static partial class PyNative
 {
     [PySymbol]
-    private static delegate* unmanaged<PyTypeObj*, int> _PyType_GetFlags;
+    private static delegate* unmanaged<nint, int> _PyType_GetFlags;
 
-    internal static int PyType_GetFlags(PyTypeObj* pType)
+    internal static int PyType_GetFlags(nint pType)
     {
         return _PyType_GetFlags(pType);
     }

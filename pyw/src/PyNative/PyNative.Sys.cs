@@ -4,12 +4,12 @@ namespace CeetemSoft.Pyw;
 unsafe internal static partial class PyNative
 {
     [PySymbol]
-    private static delegate* unmanaged<byte*, PyObj*> _PySys_GetObject;
+    private static delegate* unmanaged<byte*, nint> _PySys_GetObject;
 
     [PySymbol]
-    private static delegate* unmanaged<byte*, PyObj*, int> _PySys_SetObject;
+    private static delegate* unmanaged<byte*, nint, int> _PySys_SetObject;
 
-    internal static PyObj* PySys_GetObj(string attr)
+    internal static nint PySys_GetObj(string attr)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
@@ -18,7 +18,7 @@ unsafe internal static partial class PyNative
         return _PySys_GetObject(pAttr);
     }
 
-    internal static bool PySys_SetObj(string attr, PyObj* pValue)
+    internal static bool PySys_SetObj(string attr, nint pValue)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];

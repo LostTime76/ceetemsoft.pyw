@@ -1,10 +1,12 @@
 namespace CeetemSoft.Pyw;
 
-unsafe public readonly partial struct PyObj
+public readonly partial struct PyObj
 {
-    internal readonly PyObj* pObj;
+    public const string TypeName = "object";
 
-    internal PyObj(PyObj* pObj)
+    internal readonly nint pObj;
+
+    internal PyObj(nint pObj)
     {
         this.pObj = pObj;
     }
@@ -21,8 +23,13 @@ unsafe public readonly partial struct PyObj
         return str;
     }
 
-    internal static bool IsType(PyObj obj, int flags)
+    unsafe internal static bool IsType(nint pObj, int flags)
     {
-        return ((PyNative.PyType_GetFlags(((PyObjBase*)obj.pObj)->pType) & flags) != 0);
+        return ((PyNative.PyType_GetFlags(((PyObjBase*)pObj)->pType) & flags) != 0);
+    }
+
+    public static implicit operator PyException.ArgInfo(PyObj obj)
+    {
+        return new PyException.ArgInfo(TypeName, obj.pObj);
     }
 }
