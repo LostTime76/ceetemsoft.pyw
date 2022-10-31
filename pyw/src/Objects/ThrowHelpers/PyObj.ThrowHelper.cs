@@ -8,7 +8,7 @@ public readonly partial struct PyObj
 
         public static void ToStringFailure(PyObj obj)
         {
-            throw new PyException("Could not get the string representation of the python object.", obj);
+            throw new Exception(string.Format("Could not get the string representation of the python object. obj: 0x{0:X}", obj.pObj));
         }
     }
 }

@@ -27,9 +27,4 @@ public readonly partial struct PyObj
     {
         return ((PyNative.PyType_GetFlags(((PyObjBase*)pObj)->pType) & flags) != 0);
     }
-
-    public static implicit operator PyException.ArgInfo(PyObj obj)
-    {
-        return new PyException.ArgInfo(TypeName, obj.pObj);
-    }
 }
