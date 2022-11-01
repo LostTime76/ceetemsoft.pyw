@@ -2,8 +2,6 @@ namespace CeetemSoft.Pyw;
 
 public readonly partial struct PyStr
 {
-    public const string TypeName = "str";
-
     internal readonly nint pObj;
 
     public PyStr(string str)
@@ -45,7 +43,7 @@ public readonly partial struct PyStr
     {
         if (!PyObj.IsType(obj.pObj, PyConst.Py_Unicode_Subclass))
         {
-
+            ThrowHelper.ObjNotStr(obj);
         }
 
         return new PyStr(obj.pObj);
