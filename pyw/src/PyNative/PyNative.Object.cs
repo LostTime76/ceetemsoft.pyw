@@ -10,6 +10,12 @@ unsafe internal static partial class PyNative
     private static delegate* unmanaged<nint, void> _Py_DecRef;
 
     [PySymbol]
+    private static delegate* unmanaged<nint, nint, int> _PyObject_HasAttr;
+
+    [PySymbol]
+    private static delegate* unmanaged<nint, byte*, int> _PyObject_HasAttrString;
+
+    [PySymbol]
     private static delegate* unmanaged<nint, nint, nint> _PyObject_GetAttr;
 
     [PySymbol]
@@ -32,6 +38,20 @@ unsafe internal static partial class PyNative
     internal static void PyObj_DecRef(nint pObj)
     {
         _Py_DecRef(pObj);
+    }
+
+    internal static bool PyObj_HasAttr(nint pObj, nint pAttr)
+    {
+        return (_PyObject_HasAttr(pObj, pAttr) != 0);
+    }
+
+    internal static bool PyObj_HasAttr(nint pObj, string attr)
+    {
+        int   len   = GetUtf8StrLen(attr);
+        byte* pAttr = stackalloc byte[len + 1];
+        StrToUtf8Str(attr, pAttr, len);
+
+        return (_PyObject_HasAttrString(pObj, pAttr) != 0);
     }
 
     internal static nint PyObj_GetAttr(nint pObj, nint pAttr)

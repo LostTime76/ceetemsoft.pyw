@@ -1,76 +1,71 @@
 namespace CeetemSoft.Pyw;
 
-public readonly partial struct PyObj
+public partial class PyObj
 {
-    internal readonly nint pObj;
+    internal readonly nint Ptr;
 
-    public PyObj()
+    private PyObj() { }
+
+    internal PyObj(nint ptr)
     {
-        ThrowHelper.InvalidCreate();
+        Ptr = ptr;
     }
 
-    internal PyObj(nint pObj)
+    public bool HasAttr(string attr)
     {
-        this.pObj = pObj;
-    }
-
-    public void SetAttr(string attr, PyObj value)
-    {
-        if (!PyNative.PyObj_SetAttr(pObj, attr, value.pObj))
-        {
-            ThrowHelper.SetAttrFailure(this, attr, value);
-        }
+        return PyNative.PyObj_HasAttr(Ptr, attr);
     }
 
     public PyObj GetAttr(string attr)
     {
-        return new PyObj(PyNative.PyObj_GetAttr(pObj, attr));
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (obj == null)
+        if (attr == null)
         {
-            return false;
+            return null;
         }
 
-        return ((PyObj)obj == this);
+        // Get the attr value
+        nint pVal = PyNative.PyObj_GetAttr(Ptr, attr);
+
+        // If the attr does not exist, null should be returned
+        return ((pVal != 0) ? new PyObj(pVal) : null);
     }
 
-    public override int GetHashCode()
+    public void SetAttr(string attr, PyObj value)
     {
-        return pObj.GetHashCode();
+        // If the value is null, delete the attribute
+        if (value == null)
+        {
+            DelAttr(attr);
+        }
+
+        // Otherwise set the attr
+        else if (!PyNative.PyObj_SetAttr(Ptr, attr, value.Ptr))
+        {
+            ThrowHelper.SetAttrFail(this, attr, value);
+        }
+    }
+
+    public bool DelAttr(string attr)
+    {
+        return ((attr != null) ? PyNative.PyObj_DelAttr(Ptr, attr) : false);
     }
 
     public override string ToString()
     {
-        string str = PyNative.PyObj_NetStr(pObj);
+        string str = PyNative.PyObj_NetStr(Ptr);
 
         if (str == null)
         {
-            ThrowHelper.ToStringFailure(this);
+            ThrowHelper.ToStrFail(this);
         }
 
         return str;
     }
 
-    unsafe internal static bool IsType(nint pObj, int flags)
+    unsafe internal static bool IsType(PyObj obj, int flags)
     {
-        return ((PyNative.PyType_GetFlags(((PyObjBase*)pObj)->pType) & flags) != 0);
-    }
-
-    public static bool operator ==(PyObj a, PyObj b)
-    {
-        return (a.pObj == b.pObj);
-    }
-
-    public static bool operator !=(PyObj a, PyObj b)
-    {
-        return (a.pObj != b.pObj);
-    }
-
-    public bool IsValid
-    {
-        get { return (pObj != 0); }
+        // Python objects are structures with the first element as the reference count and the second
+        // element as a pointer to the object's type structure. Both elements are of native size.
+        return ((PyNative.PyType_GetFlags(obj.Ptr + sizeof(nint)) & flags) != 0);
     }
 }
