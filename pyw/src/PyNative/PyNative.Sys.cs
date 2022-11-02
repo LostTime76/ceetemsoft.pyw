@@ -18,12 +18,12 @@ unsafe internal static partial class PyNative
         return _PySys_GetObject(pAttr);
     }
 
-    internal static bool PySys_SetObj(string attr, nint pValue)
+    internal static bool PySys_SetObj(string attr, nint hValue)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
         StrToUtf8Str(attr, pAttr, len);
 
-        return (_PySys_SetObject(pAttr, pValue) == 0);
+        return (_PySys_SetObject(pAttr, hValue) == 0);
     }
 }

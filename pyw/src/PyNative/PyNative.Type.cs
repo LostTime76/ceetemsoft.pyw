@@ -6,8 +6,8 @@ unsafe internal static partial class PyNative
     [PySymbol]
     private static delegate* unmanaged<nint, int> _PyType_GetFlags;
 
-    internal static int PyType_GetFlags(nint pType)
+    internal static int PyType_GetFlags(nint hType)
     {
-        return _PyType_GetFlags(pType);
+        return _PyType_GetFlags(hType);
     }
 }

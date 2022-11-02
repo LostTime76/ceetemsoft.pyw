@@ -9,6 +9,7 @@ unsafe public sealed partial class PyInterp
     public string Dir     { get; private set; }
     public string DllPath { get; private set; }
     public string ExePath { get; private set; }
+    public PySys  Sys     { get; private set; }
 
     public static readonly PyInterp Instance = new PyInterp();
 
@@ -20,7 +21,7 @@ unsafe public sealed partial class PyInterp
     {
         if (Started)
         {
-            ThrowHelper.Started();
+            ThrowAlreadyStarted();
         }
         else if (_version == null)
         {
@@ -31,6 +32,7 @@ unsafe public sealed partial class PyInterp
         PyNative.Py_Initialize();
 
         // Get a reference to the system object
+        Sys     = PySys.Create();
         Started = true;
     }
 
@@ -38,7 +40,7 @@ unsafe public sealed partial class PyInterp
     {
         if (!Started)
         {
-            ThrowHelper.Stopped();
+            ThrowAlreadyStopped();
         }
 
         // Stop and clean up the interpreter
@@ -52,7 +54,7 @@ unsafe public sealed partial class PyInterp
     {
         if (Started)
         {
-            ThrowHelper.VersionSetWhenStarted();
+            ThrowVersionSetWhenStarted();
         }
         else if ((_version != null) && (version == _version))
         {
@@ -92,7 +94,7 @@ unsafe public sealed partial class PyInterp
             }
         }
 
-        return ThrowHelper.VerNotFound(root, version);
+        return ThrowVerNotFound(root, version);
     }
 
     private static string FindPythonDirFromPath()
@@ -115,7 +117,34 @@ unsafe public sealed partial class PyInterp
             }
         }
 
-        return ThrowHelper.DirNotFound();
+        return ThrowDirNotFound();
+    }
+
+    private static string ThrowAlreadyStarted()
+    {
+        throw new InvalidOperationException("The interpreter has already been started.");
+    }
+
+    private static string ThrowAlreadyStopped()
+    {
+        throw new InvalidOperationException("The interpreter has not been started.");
+    }
+
+    private static string ThrowDirNotFound()
+    {
+        throw new ArgumentException("Could not locate a python directory within the path " +
+            "environment variable.");
+    }
+
+    private static string ThrowVerNotFound(string root, string version)
+    {
+        throw new ArgumentException(string.Format("Could not find a python version: {0} within the " +
+            "directory: {1}.", root, version));
+    }
+
+    private static string ThrowVersionSetWhenStarted()
+    {
+        throw new InvalidOperationException("The version cannot be set when the interpreter is started.");
     }
 
     public string Version

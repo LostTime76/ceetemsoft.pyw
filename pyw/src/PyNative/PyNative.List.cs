@@ -4,6 +4,9 @@ namespace CeetemSoft.Pyw;
 unsafe internal static partial class PyNative
 {
     [PySymbol]
+    private static nint _PyList_Type;
+
+    [PySymbol]
     private static delegate* unmanaged<int, nint> _PyList_New;
 
     [PySymbol]
@@ -27,43 +30,53 @@ unsafe internal static partial class PyNative
     [PySymbol]
     private static delegate* unmanaged<nint, int, int, nint, int> _PyList_SetSlice;
 
+    internal static nint PyList_Type()
+    {
+        return _PyList_Type;
+    }
+
+    internal static bool PyList_CheckType(nint hObj)
+    {
+        return (_PyObject_IsInstance(hObj, _PyList_Type) == PyConst.True);
+    }
+
     internal static nint PyList_New(int size = 0)
     {
         return _PyList_New(size);
     }
 
-    internal static int PyList_Size(nint pObj)
+    internal static int PyList_Size(nint hList)
     {
-        return _PyList_Size(pObj);
+        return _PyList_Size(hList);
     }
 
-    internal static nint PyList_GetItem(nint pObj, int idx)
+    internal static nint PyList_GetItem(nint hList, int idx)
     {
-        return _PyList_GetItem(pObj, idx);
+        return _PyList_GetItem(hList, idx);
     }
 
-    internal static nint PyList_GetSlice(nint pObj, int low, int high)
+    internal static nint PyList_GetSlice(nint hList, int low, int high)
     {
-        return _PyList_GetSlice(pObj, low, high);
+        return _PyList_GetSlice(hList, low, high);
     }
 
-    internal static bool PyList_SetItem(nint pObj, int idx, nint pValue)
+    internal static bool PyList_SetItem(nint hList, int idx, nint hValue)
     {
-        return (_PyList_SetItem(pObj, idx, pValue) == 0);
+        return (_PyList_SetItem(hList, idx, hValue) == 0);
     }
 
-    internal static bool PyList_Insert(nint pObj, int idx, nint pValue)
+    internal static bool PyList_Insert(nint hList, int idx, nint hValue)
     {
-        return (_PyList_Insert(pObj, idx, pValue) == 0);
+        return (_PyList_Insert(hList, idx, hValue) == 0);
     }
 
-    internal static bool PyList_Append(nint pObj, nint pValue)
+    internal static bool PyList_Append(nint hList, nint hValue)
     {
-        return (_PyList_Append(pObj, pValue) == 0);
+        return (_PyList_Append(hList, hValue) == 0);
     }
 
-    internal static bool PyList_SetSlice(nint pObj, int low, int high, nint pValue)
+    internal static bool PyList_SetSlice(nint hList, int low, int high, nint hSlice)
     {
-        return (_PyList_SetSlice(pObj, low, high, pValue) == 0);
+        return (_PyList_SetSlice(hList, low, high, hSlice) == 0);
     }
 }

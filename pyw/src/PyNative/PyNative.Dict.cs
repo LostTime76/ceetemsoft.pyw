@@ -4,6 +4,9 @@ namespace CeetemSoft.Pyw;
 unsafe internal static partial class PyNative
 {
     [PySymbol]
+    private static nint _PyDict_Type;
+
+    [PySymbol]
     private static delegate* unmanaged<nint> _PyDict_New;
 
     [PySymbol]
@@ -39,75 +42,85 @@ unsafe internal static partial class PyNative
     [PySymbol]
     private static delegate* unmanaged<nint, nint> _PyDict_Values;
 
+    internal static bool PyDict_CheckType(nint hObj)
+    {
+        return (_PyObject_IsInstance(hObj, _PyDict_Type) == PyConst.True);
+    }
+
+    internal static nint PyDict_Type()
+    {
+        return _PyDict_Type;
+    }
+
     internal static nint PyDict_New()
     {
         return _PyDict_New();
     }
 
-    internal static int PyDict_Size(nint pObj)
+    internal static int PyDict_Size(nint hDict)
     {
-        return _PyDict_Size(pObj);
+        return _PyDict_Size(hDict);
     }
 
-    internal static void PyDict_Clear(nint pObj)
+    internal static void PyDict_Clear(nint hDict)
     {
-        _PyDict_Clear(pObj);
+        _PyDict_Clear(hDict);
     }
 
-    internal static bool PyDict_Contains(nint pObj, nint pKey)
+    internal static bool PyDict_Contains(nint hDict, nint hKey)
     {
-        return (_PyDict_Contains(pObj, pKey) != 0);
+        return (_PyDict_Contains(hDict, hKey) != 0);
     }
 
-    internal static nint PyDict_GetItem(nint pObj, nint pKey)
+    internal static nint PyDict_GetItem(nint hDict, nint hKey)
     {
-        return _PyDict_GetItem(pObj, pKey);
+        return _PyDict_GetItem(hDict, hKey);
     }
 
-    internal static nint PyDict_GetItem(nint pObj, string key)
+    internal static nint PyDict_GetItem(nint hDict, string key)
     {
         int   len  = GetUtf8StrLen(key);
         byte* pKey = stackalloc byte[len + 1];
         StrToUtf8Str(key, pKey, len);
 
-        return _PyDict_GetItemString(pObj, pKey);
+        return _PyDict_GetItemString(hDict, pKey);
     }
 
-    internal static bool PyDict_SetItem(nint pObj, nint pKey, nint pValue)
+    internal static bool PyDict_SetItem(nint hDict, nint hKey, nint hValue)
     {
-        return (_PyDict_SetItem(pObj, pKey, pValue) == 0);
+        return (_PyDict_SetItem(hDict, hKey, hValue) == 0);
     }
 
-    internal static bool PyDict_SetItem(nint pObj, string key, nint pValue)
-    {
-        int   len  = GetUtf8StrLen(key);
-        byte* pKey = stackalloc byte[len + 1];
-        StrToUtf8Str(key, pKey, len);
-
-        return (_PyDict_SetItemString(pObj, pKey, pValue) == 0);
-    }
-
-    internal static bool PyDict_DelItem(nint pObj, nint pKey)
-    {
-        return (_PyDict_DelItem(pObj, pKey) == 0);
-    }
-
-    internal static bool PyDict_DelItem(nint pObj, string key)
+    internal static bool PyDict_SetItem(nint hDict, string key, nint hValue)
     {
         int   len  = GetUtf8StrLen(key);
         byte* pKey = stackalloc byte[len + 1];
         StrToUtf8Str(key, pKey, len);
 
-        return (_PyDict_DelItemString(pObj, pKey) == 0);
+        return (_PyDict_SetItemString(hDict, pKey, hValue) == 0);
     }
 
-    internal static nint PyDict_Keys(nint pObj)
+    internal static bool PyDict_DelItem(nint hDict, nint hKey)
     {
-        return _PyDict_Keys(pObj);
+        return (_PyDict_DelItem(hDict, hKey) == 0);
     }
 
-    internal static nint PyDict_Values(nint pObj)
+    internal static bool PyDict_DelItem(nint hDict, string key)
     {
-        return _PyDict_Values(pObj);
+        int   len  = GetUtf8StrLen(key);
+        byte* pKey = stackalloc byte[len + 1];
+        StrToUtf8Str(key, pKey, len);
+
+        return (_PyDict_DelItemString(hDict, pKey) == 0);
+    }
+
+    internal static nint PyDict_Keys(nint hDict)
+    {
+        return _PyDict_Keys(hDict);
+    }
+
+    internal static nint PyDict_Values(nint hDict)
+    {
+        return _PyDict_Values(hDict);
     }
 }

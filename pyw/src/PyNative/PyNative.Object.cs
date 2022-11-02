@@ -10,6 +10,9 @@ unsafe internal static partial class PyNative
     private static delegate* unmanaged<nint, void> _Py_DecRef;
 
     [PySymbol]
+    private static delegate* unmanaged<nint, nint, int> _PyObject_IsInstance;
+
+    [PySymbol]
     private static delegate* unmanaged<nint, nint, int> _PyObject_HasAttr;
 
     [PySymbol]
@@ -30,92 +33,97 @@ unsafe internal static partial class PyNative
     [PySymbol]
     private static delegate* unmanaged<nint, nint> _PyObject_Str;
 
-    internal static void PyObj_IncRef(nint pObj)
+    internal static void PyObj_IncRef(nint hObj)
     {
-        _Py_IncRef(pObj);
+        _Py_IncRef(hObj);
     }
 
-    internal static void PyObj_DecRef(nint pObj)
+    internal static void PyObj_DecRef(nint hObj)
     {
-        _Py_DecRef(pObj);
+        _Py_DecRef(hObj);
     }
 
-    internal static bool PyObj_HasAttr(nint pObj, nint pAttr)
+    internal static bool PyObj_IsInstance(nint hObj, nint hTypeObj)
     {
-        return (_PyObject_HasAttr(pObj, pAttr) != 0);
+        return (_PyObject_IsInstance(hObj, hTypeObj) != 0);
     }
 
-    internal static bool PyObj_HasAttr(nint pObj, string attr)
+    internal static bool PyObj_HasAttr(nint hObj, nint hAttr)
     {
-        int   len   = GetUtf8StrLen(attr);
-        byte* pAttr = stackalloc byte[len + 1];
-        StrToUtf8Str(attr, pAttr, len);
-
-        return (_PyObject_HasAttrString(pObj, pAttr) != 0);
+        return (_PyObject_HasAttr(hObj, hAttr) != 0);
     }
 
-    internal static nint PyObj_GetAttr(nint pObj, nint pAttr)
-    {
-        return _PyObject_GetAttr(pObj, pAttr);
-    }
-
-    internal static nint PyObj_GetAttr(nint pObj, string attr)
+    internal static bool PyObj_HasAttr(nint hObj, string attr)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
         StrToUtf8Str(attr, pAttr, len);
 
-        return _PyObject_GetAttrString(pObj, pAttr);
+        return (_PyObject_HasAttrString(hObj, pAttr) != 0);
     }
 
-    internal static bool PyObj_SetAttr(nint pObj, nint pAttr, nint pValue)
+    internal static nint PyObj_GetAttr(nint hObj, nint hAttr)
     {
-        return (_PyObject_SetAttr(pObj, pAttr, pValue) == 0);
+        return _PyObject_GetAttr(hObj, hAttr);
     }
 
-    internal static bool PyObj_SetAttr(nint pObj, string attr, nint pValue)
-    {
-        int   len   = GetUtf8StrLen(attr);
-        byte* pAttr = stackalloc byte[len + 1];
-        StrToUtf8Str(attr, pAttr, len);
-
-        return (_PyObject_SetAttrString(pObj, pAttr, pValue) == 0);
-    }
-
-    internal static bool PyObj_DelAttr(nint pObj, nint pAttr)
-    {
-        return (_PyObject_SetAttr(pObj, pAttr, 0) == 0);
-    }
-
-    internal static bool PyObj_DelAttr(nint pObj, string attr)
+    internal static nint PyObj_GetAttr(nint hObj, string attr)
     {
         int   len   = GetUtf8StrLen(attr);
         byte* pAttr = stackalloc byte[len + 1];
         StrToUtf8Str(attr, pAttr, len);
 
-        return (_PyObject_SetAttrString(pObj, pAttr, 0) == 0);
+        return _PyObject_GetAttrString(hObj, pAttr);
     }
 
-    internal static nint PyObj_Str(nint pObj)
+    internal static bool PyObj_SetAttr(nint hObj, nint hAttr, nint hValue)
     {
-        return _PyObject_Str(pObj);
+        return (_PyObject_SetAttr(hObj, hAttr, hValue) == 0);
     }
 
-    internal static string PyObj_NetStr(nint pObj)
+    internal static bool PyObj_SetAttr(nint hObj, string attr, nint hValue)
+    {
+        int   len   = GetUtf8StrLen(attr);
+        byte* pAttr = stackalloc byte[len + 1];
+        StrToUtf8Str(attr, pAttr, len);
+
+        return (_PyObject_SetAttrString(hObj, pAttr, hValue) == 0);
+    }
+
+    internal static bool PyObj_DelAttr(nint hObj, nint hAttr)
+    {
+        return (_PyObject_SetAttr(hObj, hAttr, 0) == 0);
+    }
+
+    internal static bool PyObj_DelAttr(nint hObj, string attr)
+    {
+        int   len   = GetUtf8StrLen(attr);
+        byte* pAttr = stackalloc byte[len + 1];
+        StrToUtf8Str(attr, pAttr, len);
+
+        return (_PyObject_SetAttrString(hObj, pAttr, 0) == 0);
+    }
+
+    internal static nint PyObj_Str(nint hObj)
+    {
+        return _PyObject_Str(hObj);
+    }
+
+    internal static string PyObj_NetStr(nint hObj)
     {
         // Get the object's string representation
-        nint pStr = _PyObject_Str(pObj);
+        nint hStr = _PyObject_Str(hObj);
 
-        if (pStr == 0)
+        if (hStr == 0)
         {
             return null;
         }
 
         // Convert the string object to a NET string
-        string str  = new string((sbyte*)_PyUnicode_AsUTF8(pStr));
+        string str  = new string((sbyte*)_PyUnicode_AsUTF8(hStr));
 
         // Garbage collect the string object as we don't need it
-        _Py_DecRef(pStr);
+        _Py_DecRef(hStr);
 
         // Return the NET string
         return str;
