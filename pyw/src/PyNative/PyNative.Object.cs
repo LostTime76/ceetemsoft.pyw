@@ -120,7 +120,7 @@ unsafe internal static partial class PyNative
         }
 
         // Convert the string object to a NET string
-        string str  = new string((sbyte*)_PyUnicode_AsUTF8(hStr));
+        string str = new string((sbyte*)_PyUnicode_AsUTF8(hStr));
 
         // Garbage collect the string object as we don't need it
         _Py_DecRef(hStr);

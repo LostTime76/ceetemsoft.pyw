@@ -10,7 +10,13 @@ unsafe internal static partial class PyNative
     private static delegate* unmanaged<long, nint> _PyLong_FromLong;
 
     [PySymbol]
+    private static delegate* unmanaged<ulong, nint> _PyLong_FromUnsignedLong;
+
+    [PySymbol]
     private static delegate* unmanaged<nint, long> _PyLong_AsLong;
+
+    [PySymbol]
+    private static delegate* unmanaged<nint, nint> _PyNumber_Long;
 
     internal static nint PyLong_Type()
     {
@@ -27,8 +33,18 @@ unsafe internal static partial class PyNative
         return (_PyLong_FromLong(value));
     }
 
+    internal static nint PyLong_New(ulong value)
+    {
+        return _PyLong_FromUnsignedLong(value);
+    }
+
     internal static long PyLong_AsLong(nint hLong)
     {
         return _PyLong_AsLong(hLong);
+    }
+
+    internal static nint PyLong_Conv(nint hObj)
+    {
+        return _PyNumber_Long(hObj);
     }
 }

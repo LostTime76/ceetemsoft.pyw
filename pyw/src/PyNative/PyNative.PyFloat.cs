@@ -12,6 +12,9 @@ unsafe internal static partial class PyNative
     [PySymbol]
     private static delegate* unmanaged<nint, double> _PyFloat_AsDouble;
 
+    [PySymbol]
+    private static delegate* unmanaged<nint, nint> _PyNumber_Float;
+
     internal static nint PyFloat_Type()
     {
         return _PyFloat_Type;
@@ -30,5 +33,10 @@ unsafe internal static partial class PyNative
     internal static double PyFloat_AsDouble(nint hDouble)
     {
         return _PyFloat_AsDouble(hDouble);
+    }
+
+    internal static nint PyFloat_Conv(nint hObj)
+    {
+        return _PyNumber_Float(hObj);
     }
 }

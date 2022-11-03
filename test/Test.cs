@@ -7,7 +7,5 @@ public static class Test
         PyInterp interp = PyInterp.Instance;
 
         interp.Start();
-
-        PySys sys = interp.Sys;
     }
 }
