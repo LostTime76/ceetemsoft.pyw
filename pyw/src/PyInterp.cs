@@ -1,7 +1,5 @@
 namespace CeetemSoft.Pyw;
 
-using System.Runtime.InteropServices;
-
 unsafe public sealed partial class PyInterp
 {
     public bool   Started { get; private set; }
@@ -94,7 +92,8 @@ unsafe public sealed partial class PyInterp
             }
         }
 
-        return ThrowVerNotFound(root, version);
+        ThrowVerNotFound(root, version);
+        return null;
     }
 
     private static string FindPythonDirFromPath()
@@ -117,32 +116,33 @@ unsafe public sealed partial class PyInterp
             }
         }
 
-        return ThrowDirNotFound();
+        ThrowDirNotFound();
+        return null;
     }
 
-    private static string ThrowAlreadyStarted()
+    private static void ThrowAlreadyStarted()
     {
         throw new InvalidOperationException("The interpreter has already been started.");
     }
 
-    private static string ThrowAlreadyStopped()
+    private static void ThrowAlreadyStopped()
     {
         throw new InvalidOperationException("The interpreter has not been started.");
     }
 
-    private static string ThrowDirNotFound()
+    private static void ThrowDirNotFound()
     {
         throw new ArgumentException("Could not locate a python directory within the path " +
             "environment variable.");
     }
 
-    private static string ThrowVerNotFound(string root, string version)
+    private static void ThrowVerNotFound(string root, string version)
     {
         throw new ArgumentException(string.Format("Could not find a python version: {0} within the " +
             "directory: {1}.", root, version));
     }
 
-    private static string ThrowVersionSetWhenStarted()
+    private static void ThrowVersionSetWhenStarted()
     {
         throw new InvalidOperationException("The version cannot be set when the interpreter is started.");
     }
