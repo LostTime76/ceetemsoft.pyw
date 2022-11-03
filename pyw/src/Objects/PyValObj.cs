@@ -1,24 +1,24 @@
 namespace CeetemSoft.Pyw;
 
-public readonly struct PyValue
+public readonly struct PyValObj
 {
     public readonly nint Handle;
 
-    public PyValue() : this(0L) { }
+    public PyValObj() : this(0L) { }
 
-    public PyValue(bool value) : this(FromBool(value)) { }
+    public PyValObj(bool value) : this(FromBool(value)) { }
 
-    public PyValue(int value) : this(FromLong(value)) { }
+    public PyValObj(int value) : this(FromLong(value)) { }
 
-    public PyValue(long value) : this(FromLong(value)) { }
+    public PyValObj(long value) : this(FromLong(value)) { }
 
-    public PyValue(ulong value) : this(FromLong(value)) { }
+    public PyValObj(ulong value) : this(FromLong(value)) { }
 
-    public PyValue(double value) : this(FromFloat(value)) { }
+    public PyValObj(double value) : this(FromFloat(value)) { }
 
-    public PyValue(string str) : this(FromStr(str)) { }
+    public PyValObj(string str) : this(FromStr(str)) { }
 
-    public PyValue(nint hValue)
+    public PyValObj(nint hValue)
     {
         if (hValue == 0)
         {
@@ -40,7 +40,7 @@ public readonly struct PyValue
         return str;
     }
 
-    private static PyValue FromBool(bool value)
+    private static PyValObj FromBool(bool value)
     {
         nint hBool = PyNative.PyBool_New(value);
 
@@ -49,10 +49,10 @@ public readonly struct PyValue
             ThrowFromBoolFailure(value);
         }
 
-        return new PyValue(hBool);
+        return new PyValObj(hBool);
     }
 
-    private static PyValue FromLong(long value)
+    private static PyValObj FromLong(long value)
     {
         nint hLong = PyNative.PyLong_New(value);
 
@@ -61,10 +61,10 @@ public readonly struct PyValue
             ThrowFromLongFailure(value);
         }
 
-        return new PyValue(hLong);
+        return new PyValObj(hLong);
     }
 
-    private static PyValue FromLong(ulong value)
+    private static PyValObj FromLong(ulong value)
     {
         nint hLong = PyNative.PyLong_New(value);
 
@@ -73,10 +73,10 @@ public readonly struct PyValue
             ThrowFromLongFailure(value);
         }
 
-        return new PyValue(hLong);
+        return new PyValObj(hLong);
     }
 
-    private static PyValue FromFloat(double value)
+    private static PyValObj FromFloat(double value)
     {
         nint hFloat = PyNative.PyFloat_New(value);
 
@@ -85,10 +85,10 @@ public readonly struct PyValue
             ThrowFromFloatFailure(value);
         }
 
-        return new PyValue(hFloat);
+        return new PyValObj(hFloat);
     }
 
-    private static PyValue FromStr(string str)
+    private static PyValObj FromStr(string str)
     {
         if (str == null)
         {
@@ -102,20 +102,25 @@ public readonly struct PyValue
             ThrowFromStrFailure(str);
         }
 
-        return new PyValue(hStr);
+        return new PyValObj(hStr);
     }
 
-    public static implicit operator nint(PyValue obj)
+    public static implicit operator nint(PyValObj obj)
     {
         return obj.Handle;
     }
 
-    public static explicit operator PyValue(nint hObj)
+    public static implicit operator PyValObj(PyObj obj)
     {
-        return new PyValue(hObj);
+        return new PyValObj(obj.Handle);
     }
 
-    public static explicit operator bool(PyValue obj)
+    public static explicit operator PyValObj(nint hObj)
+    {
+        return new PyValObj(hObj);
+    }
+
+    public static explicit operator bool(PyValObj obj)
     {
         nint hObj = obj.Handle;
 
@@ -136,7 +141,7 @@ public readonly struct PyValue
         return value;
     }
 
-    public static explicit operator long(PyValue obj)
+    public static explicit operator long(PyValObj obj)
     {
         nint hObj = obj.Handle;
 
@@ -157,12 +162,12 @@ public readonly struct PyValue
         return value;
     }
 
-    public static explicit operator float(PyValue obj)
+    public static explicit operator float(PyValObj obj)
     {
         return (float)((double)obj);
     }
 
-    public static explicit operator double(PyValue obj)
+    public static explicit operator double(PyValObj obj)
     {
         nint hObj = obj.Handle;
 
@@ -183,7 +188,7 @@ public readonly struct PyValue
         return value;
     }
 
-    public static explicit operator string(PyValue obj)
+    public static explicit operator string(PyValObj obj)
     {
         return obj.ToString();
     }
