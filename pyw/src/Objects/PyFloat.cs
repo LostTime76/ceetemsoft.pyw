@@ -65,6 +65,11 @@ public readonly struct PyFloat
         return hFloat.Handle;
     }
 
+    public static implicit operator PyValueType(PyFloat obj)
+    {
+        return new PyValueType(obj.Handle);
+    }
+
     public static explicit operator double(PyFloat obj)
     {
         return PyNative.PyFloat_AsDouble(obj);
@@ -73,6 +78,11 @@ public readonly struct PyFloat
     public static explicit operator PyFloat(nint hFloat)
     {
         return new PyFloat(hFloat);
+    }
+
+    public static explicit operator PyFloat(PyObj obj)
+    {
+        return new PyFloat(obj.Handle);
     }
 
     private static void ThrowCreateFailure(double value)

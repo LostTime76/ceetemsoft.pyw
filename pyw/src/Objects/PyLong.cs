@@ -65,6 +65,11 @@ public readonly struct PyLong
         return hLong.Handle;
     }
 
+    public static implicit operator PyValueType(PyLong obj)
+    {
+        return new PyValueType(obj.Handle);
+    }
+
     public static explicit operator long(PyLong obj)
     {
         return PyNative.PyLong_AsLong(obj);
@@ -73,6 +78,11 @@ public readonly struct PyLong
     public static explicit operator PyLong(nint hLong)
     {
         return new PyLong(hLong);
+    }
+
+    public static explicit operator PyLong(PyObj obj)
+    {
+        return new PyLong(obj.Handle);
     }
 
     private static void ThrowCreateFailure(long value)

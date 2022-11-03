@@ -69,6 +69,11 @@ public readonly struct PyStr
         return str.Handle;
     }
 
+    public static implicit operator PyValueType(PyStr str)
+    {
+        return new PyValueType(str.Handle);
+    }
+
     public static explicit operator string(PyStr str)
     {
         return str.ToString();
@@ -77,6 +82,11 @@ public readonly struct PyStr
     public static explicit operator PyStr(nint hStr)
     {
         return new PyStr(hStr);
+    }
+
+    public static explicit operator PyStr(PyObj obj)
+    {
+        return new PyStr(obj.Handle);
     }
 
     private static void ThrowInvalidHandle()

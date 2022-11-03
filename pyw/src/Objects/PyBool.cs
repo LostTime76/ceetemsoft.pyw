@@ -65,6 +65,11 @@ public readonly struct PyBool
         return hBool.Handle;
     }
 
+    public static implicit operator PyValueType(PyBool obj)
+    {
+        return new PyValueType(obj.Handle);
+    }
+
     public static explicit operator bool(PyBool obj)
     {
         return PyNative.PyBool_AsBool(obj);
@@ -73,6 +78,11 @@ public readonly struct PyBool
     public static explicit operator PyBool(nint hBool)
     {
         return new PyBool(hBool);
+    }
+
+    public static explicit operator PyBool(PyObj obj)
+    {
+        return new PyBool(obj.Handle);
     }
 
     private static void ThrowCreateFailure(bool value)
