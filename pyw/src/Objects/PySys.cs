@@ -1,9 +1,9 @@
 namespace CeetemSoft.Pyw;
 
-public sealed class PySys
+public readonly struct PySys
 {
-    internal static PySys Create()
+    public PySys()
     {
-        return null;
+        
     }
 }

@@ -1,6 +1,6 @@
 namespace CeetemSoft.Pyw;
 
-unsafe public sealed partial class PyInterp
+unsafe public sealed class PyInterp
 {
     public bool   Started { get; private set; }
     public string Name    { get; private set; }
@@ -29,8 +29,8 @@ unsafe public sealed partial class PyInterp
         // Initialize and start the interpreter
         PyNative.Py_Initialize();
 
-        // Get a reference to the system object
-        Sys     = PySys.Create();
+        // Initialize the system object
+        Sys     = new PySys();
         Started = true;
     }
 

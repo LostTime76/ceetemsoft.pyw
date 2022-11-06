@@ -10,6 +10,9 @@ unsafe internal static partial class PyNative
     private static delegate* unmanaged<nint, void> _Py_DecRef;
 
     [PySymbol]
+    private static delegate* unmanaged<nint, nint> _PyObject_Type;
+
+    [PySymbol]
     private static delegate* unmanaged<nint, nint, int> _PyObject_IsInstance;
 
     [PySymbol]
@@ -41,6 +44,11 @@ unsafe internal static partial class PyNative
     internal static void PyObj_DecRef(nint hObj)
     {
         _Py_DecRef(hObj);
+    }
+
+    internal static nint PyObj_Type(nint hObj)
+    {
+        return _PyObject_Type(hObj);
     }
 
     internal static bool PyObj_IsInstance(nint hObj, nint hTypeObj)

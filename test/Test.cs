@@ -7,5 +7,12 @@ public static class Test
         PyInterp interp = PyInterp.Instance;
 
         interp.Start();
+
+        PyObj o = new PyObj();
+        PyBool b = new PyBool(false);
+
+        long l = b.RefCount;
+
+        o = (PyBool)b;
     }
 }
