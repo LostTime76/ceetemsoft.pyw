@@ -8,11 +8,7 @@ public static class Test
 
         interp.Start();
 
-        PyObj o = new PyObj();
-        PyBool b = new PyBool(false);
-
-        long l = b.RefCount;
-
-        o = (PyBool)b;
+        PyBool b = new PyBool(true);
+        PyObj o = b;
     }
 }

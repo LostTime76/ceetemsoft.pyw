@@ -28,7 +28,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyLong_CheckType(nint hObj)
     {
-        return (_PyObject_IsInstance(hObj, _PyLong_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyLong_Type);
     }
 
     internal static nint PyLong_New(long value)

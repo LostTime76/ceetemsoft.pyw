@@ -8,7 +8,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyModule_CheckType(nint hObj)
     {
-        return (_PyObject_IsInstance(hObj, _PyModule_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyModule_Type);
     }
 
     internal static nint PyModule_Type()

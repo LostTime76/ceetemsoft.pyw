@@ -16,8 +16,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyBool_CheckType(nint hObj)
     {
-        return false;
-        //return (_PyObject_IsInstance(hObj, _PyBool_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyBool_Type);
     }
 
     internal static nint PyBool_New(bool value)

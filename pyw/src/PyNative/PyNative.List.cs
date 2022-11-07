@@ -37,7 +37,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyList_CheckType(nint hObj)
     {
-        return (_PyObject_IsInstance(hObj, _PyList_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyList_Type);
     }
 
     internal static nint PyList_New(int size = 0)

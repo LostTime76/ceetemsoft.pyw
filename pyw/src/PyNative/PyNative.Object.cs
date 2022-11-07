@@ -53,7 +53,8 @@ unsafe internal static partial class PyNative
 
     internal static bool PyObj_IsInstance(nint hObj, nint hTypeObj)
     {
-        return (_PyObject_IsInstance(hObj, hTypeObj) != 0);
+        return ((hObj != PyConst.InvalidHandle) ? 
+            (_PyObject_IsInstance(hObj, hTypeObj) == PyConst.True) : false);
     }
 
     internal static bool PyObj_HasAttr(nint hObj, nint hAttr)

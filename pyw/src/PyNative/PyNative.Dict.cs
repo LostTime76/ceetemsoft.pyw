@@ -44,7 +44,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyDict_CheckType(nint hObj)
     {
-        return (_PyObject_IsInstance(hObj, _PyDict_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyDict_Type);
     }
 
     internal static nint PyDict_Type()

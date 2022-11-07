@@ -14,7 +14,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyUnicode_CheckType(nint hObj)
     {
-        return (_PyObject_IsInstance(hObj, _PyUnicode_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyUnicode_Type);
     }
 
     internal static nint PyUnicode_Type()

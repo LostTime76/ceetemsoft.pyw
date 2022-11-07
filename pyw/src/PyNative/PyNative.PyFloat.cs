@@ -22,7 +22,7 @@ unsafe internal static partial class PyNative
 
     internal static bool PyFloat_CheckType(nint hObj)
     {
-        return (_PyObject_IsInstance(hObj, _PyFloat_Type) == PyConst.True);
+        return PyObj_IsInstance(hObj, _PyFloat_Type);
     }
 
     internal static nint PyFloat_New(double value)
