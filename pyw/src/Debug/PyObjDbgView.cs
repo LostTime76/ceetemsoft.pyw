@@ -1,11 +1,19 @@
+using System.Diagnostics;
+
 namespace CeetemSoft.Pyw;
 
 public class PyObjDbgView
 {
-    public readonly int field = 42;
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    protected PyObj obj;
 
-    public PyObjDbgView(IPyDbgObj obj)
+    public PyObjDbgView(PyObj obj)
     {
-        System.Diagnostics.Debug.WriteLine(obj.ToString());
+        this.obj = obj;    
+    }
+
+    public nint Handle
+    {
+        get { return obj.Handle; }
     }
 }

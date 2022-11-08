@@ -2,35 +2,25 @@ using System.Diagnostics;
 
 namespace CeetemSoft.Pyw;
 
-[DebuggerDisplay("{Value}", Type=nameof(PyBool))]
 [DebuggerTypeProxy(typeof(PyBoolDbgView))]
-public struct PyBool : IPyDbgObj
+[DebuggerDisplay(PyObj.DbgDisplayValue, Target=typeof(PyBool))]
+public struct PyBool : IPyObj
 {
     public const string Typename = "bool";
 
-    public nint Handle { get; private set; }
+    private nint _handle;
 
     public PyBool()           : this(Create(false)) { }
     public PyBool(bool value) : this(Create(value)) { }
 
     public PyBool(nint hBool)
     {
-        Handle = hBool;
-    }
-
-    public void IncRef()
-    {
-        PyNative.PyObj_IncRef(Handle);
-    }
-
-    public void DecRef()
-    {
-        PyNative.PyObj_DecRef(Handle);
+        _handle = hBool;
     }
 
     public nint GetHandle()
     {
-        return Handle;
+        return _handle;
     }
 
     public string GetTypename()
@@ -38,19 +28,24 @@ public struct PyBool : IPyDbgObj
         return Typename;
     }
 
-    public object GetDebugValue()
+    public object GetValue()
     {
         return Value;
     }
 
-    private static nint Create(bool value)
+    public IPyObj NewInst(nint hBool)
     {
-        return PyNative.PyBool_New(value);
+        return new PyBool(hBool);
+    }
+
+    public override string ToString()
+    {
+        return PyNative.PyObj_NetStr(_handle);
     }
 
     public static implicit operator PyObj(PyBool obj)
     {
-        return new PyObj(obj.Handle);
+        return new PyObj(obj._handle);
     }
 
     public static explicit operator PyBool(PyObj obj)
@@ -58,21 +53,31 @@ public struct PyBool : IPyDbgObj
         return new PyBool(obj.Handle);
     }
 
+    private static nint Create(bool value)
+    {
+        return PyNative.PyBool_New(value);        
+    }
+
     public bool IsValid
     {
-        get { return PyNative.PyBool_CheckType(Handle); }
+        get { return PyNative.PyBool_CheckType(_handle); }
     }
 
     public bool Value
     {
-        get { return PyNative.PyBool_AsBool(Handle); }
+        get { return PyNative.PyBool_AsBool(_handle); }
         set
         {
-            // Decrement reference to the existing handle
-            PyNative.PyObj_DecRef(Handle);
-            
+            // Decrement the reference count for the existing object
+            PyNative.PyObj_DecRef(_handle);
+
             // Create a new bool object
-            Handle = PyNative.PyBool_New(value);
+            _handle = PyNative.PyBool_New(value);
         }
+    }
+
+    public nint Handle
+    {
+        get { return _handle; }
     }
 }

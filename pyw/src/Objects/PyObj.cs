@@ -2,11 +2,12 @@ using System.Diagnostics;
 
 namespace CeetemSoft.Pyw;
 
-[DebuggerDisplay("{GetDebugValue()}", Type=nameof(PyObj))]
 [DebuggerTypeProxy(typeof(PyObjDbgView))]
-public struct PyObj //: IPyDbgObj
+[DebuggerDisplay(PyObj.DbgDisplayValue, Target=typeof(PyObj))]
+public readonly struct PyObj : IPyObj
 {
-    public const string Typename = "object";
+    public const string Typename        = "object";
+    public const string DbgDisplayValue = "{GetValue()}";
 
     public readonly nint Handle;
 
@@ -25,8 +26,18 @@ public struct PyObj //: IPyDbgObj
         return Typename;
     }
 
-    public object GetDebugValue()
+    public object GetValue()
     {
         return null;
+    }
+
+    public IPyObj NewInst(nint hObj)
+    {
+        return new PyObj(hObj);
+    }
+
+    public override string ToString()
+    {
+        return PyNative.PyObj_NetStr(Handle);
     }
 }
