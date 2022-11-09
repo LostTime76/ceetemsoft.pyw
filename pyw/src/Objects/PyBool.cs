@@ -4,7 +4,7 @@ namespace CeetemSoft.Pyw;
 
 [DebuggerTypeProxy(typeof(PyBoolDbgView))]
 [DebuggerDisplay(PyObj.DbgDisplayValue, Target=typeof(PyBool))]
-public struct PyBool : IPyObj
+public class PyBool : IPyObj
 {
     public const string Typename = "bool";
 

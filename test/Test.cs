@@ -10,5 +10,10 @@ public static class Test
 
         PyBool b = new PyBool(true);
         PyObj o = b;
+
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
     }
 }
