@@ -8,6 +8,6 @@ public readonly struct PyDict : IPyObj
 
     public PyDict(nint hDict)
     {
-        _handle = (PyNative.PyDict_CheckType(hDict) ? hDict : PyConst.InvalidHandle);
+        _handle = (PyNative.PyDict_CheckType(hDict) ? hDict : PyConst.InvalidHandle); 
     }
 }
