@@ -7,13 +7,5 @@ public static class Test
         PyInterp interp = PyInterp.Instance;
 
         interp.Start();
-
-        PyBool b = new PyBool(true);
-        PyObj o = b;
-
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine();
     }
 }
