@@ -8,7 +8,7 @@ public static class PyConst
     public const nint   InvalidHandle = 0;
     public const char   PathDelim     = ';';
     public const string Python        = "python";
-    public const string ExePathFmt    = "{0}.exe";
+    public const string ExePathFmt    = "{0}.exe"; 
     public const string DllPathFmt    = "{0}.dll";
     public const string PathEnvVar    = "Path";
 

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\pyw\pyw.csproj" />
+    <ProjectReference Include="..\pyw.gen\pyw.gen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
   </ItemGroup>
 
   <PropertyGroup>
