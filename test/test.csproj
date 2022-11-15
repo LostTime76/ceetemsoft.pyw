@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\pyw\pyw.csproj" />
-    <ProjectReference Include="..\pyw.gen\pyw.gen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
+    <ProjectReference Include="..\pyw\pyw.csproj"/>
   </ItemGroup>
 
   <PropertyGroup>

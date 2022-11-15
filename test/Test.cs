@@ -7,5 +7,7 @@ public static class Test
         PyInterp interp = PyInterp.Instance;
 
         interp.Start();
+
+        PyDict dict = new PyDict();
     }
 }

@@ -1,7 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\pyw.gen\pyw.gen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
-  </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
