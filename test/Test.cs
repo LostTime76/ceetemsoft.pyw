@@ -8,6 +8,8 @@ public static class Test
 
         interp.Start();
 
-        PyDict dict = new PyDict();
+        PyBool b = PyBool.Create();
+
+        PyObj o = b;
     }
 }
