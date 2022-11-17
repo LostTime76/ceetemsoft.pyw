@@ -6,9 +6,13 @@ namespace CeetemSoft.Pyw;
 public readonly struct PyBool : IPyDbgObj
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private const string _PyTypename = "bool";
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public nint Handle { get; init; }
 
-    public PyBool() : this (PyConst.InvalidHandle) { }
+    public PyBool()           : this(false) { }
+    public PyBool(bool value) : this(PyNative.PyBool_New(value)) { }
 
     public PyBool(nint hBool)
     {
@@ -17,12 +21,7 @@ public readonly struct PyBool : IPyDbgObj
 
     public override string ToString()
     {
-        return Value.ToString().ToLower();
-    }
-
-    public static PyBool Create(bool value = false)
-    {
-        return new PyBool(PyNative.PyBool_New(value));
+        return ((bool)this).ToString().ToLower();
     }
 
     public static IPyDbgObj FromHandle(nint hBool)
@@ -30,14 +29,19 @@ public readonly struct PyBool : IPyDbgObj
         return new PyBool(hBool);
     }
 
+    public static implicit operator PyBool(bool value)
+    {
+        return new PyBool(PyNative.PyBool_New(value));
+    }
+
+    public static implicit operator bool(PyBool obj)
+    {
+        return PyNative.PyBool_AsBool(obj.Handle);
+    }
+
     public static implicit operator PyObj(PyBool obj)
     {
         return new PyObj(obj.Handle);
-    }
-
-    public static explicit operator PyBool(PyObj obj)
-    {
-        return new PyBool(obj.Handle);
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -46,16 +50,15 @@ public readonly struct PyBool : IPyDbgObj
         get { return ((Handle != PyConst.InvalidHandle) && PyNative.PyBool_CheckType(Handle)); }
     }
 
-    [PyDbgMember]
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public bool Value
+    public string PyTypename
     {
-        get { return PyNative.PyBool_AsBool(Handle); }
+        get { return _PyTypename; }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-    public PyDbgMember[] DbgMembers
+    public PyDbgObj DbgObj
     {
-        get { return PyDbg.GetDbgMembers(this); }
+        get { return new PyDbgObj(this); }
     }
 }

@@ -36,6 +36,12 @@ unsafe internal static partial class PyNative
     [PySymbol]
     private static delegate* unmanaged<nint, nint> _PyObject_Str;
 
+    [PySymbol]
+    private static delegate* unmanaged<nint, nint> _PyObject_Dir;
+
+    [PySymbol]
+    private static delegate* unmanaged<nint, nint> _PyObject_GetIter;
+
     internal static void PyObj_IncRef(nint hObj)
     {
         _Py_IncRef(hObj);
@@ -116,6 +122,16 @@ unsafe internal static partial class PyNative
     internal static nint PyObj_Str(nint hObj)
     {
         return _PyObject_Str(hObj);
+    }
+
+    internal static nint PyObj_Dir(nint hObj)
+    {
+        return _PyObject_Dir(hObj);
+    }
+
+    internal static nint PyObj_Iter(nint hObj)
+    {
+        return _PyObject_GetIter(hObj);
     }
 
     internal static string PyObj_NetStr(nint hObj)

@@ -8,8 +8,9 @@ public static class Test
 
         interp.Start();
 
-        PyBool b = PyBool.Create();
+        PyBool b = true;
 
-        PyObj o = b;
+        Console.WriteLine();
+        Console.WriteLine();
     }
 }

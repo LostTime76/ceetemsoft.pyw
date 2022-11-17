@@ -16,9 +16,14 @@ public interface IPyDbgObj
     public nint Handle { get; }
 
     /// <summary>
-    ///     Returns all of the members within the wrapper object
+    ///     Returns the python object typename that the wrapper wraps
     /// </summary>
-    public PyDbgMember[] DbgMembers { get; }
+    public string PyTypename { get; }
+
+    /// <summary>
+    ///     Returns a debug object for the wrapper
+    /// </summary>
+    public PyDbgObj DbgObj { get; }
 
     /// <summary>
     ///     Creates a new wrapper object using the given handle
