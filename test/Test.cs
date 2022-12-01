@@ -4,13 +4,6 @@ public static class Test
 {
     public static void Main(string[] args)
     {
-        PyInterp interp = PyInterp.Instance;
-
-        interp.Start();
-
-        PyBool b = true;
-
-        Console.WriteLine();
-        Console.WriteLine();
+        
     }
 }
